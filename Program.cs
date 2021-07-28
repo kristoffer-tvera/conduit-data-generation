@@ -27,9 +27,10 @@ namespace ConduitData
             var idiot = conduits.First();
 
             var journalExpansionResponse = GetJournalExpansionResponse(client);
+            var journalExpansionWorldBossesInstanceResponse = GetJournalExpansionResponseWorldBosses(client);
             var journalEncounterRaidResponse = journalExpansionResponse.Raids.Select(raid => GetJournalInstanceResponse(client, raid.Key));
             var journalEncounterDungeonResponse = journalExpansionResponse.Dungeons.Select(dungeon => GetJournalInstanceResponse(client, dungeon.Key));
-
+            
 
             var encounters = new List<Encounter>();
             
@@ -42,6 +43,10 @@ namespace ConduitData
             {
                 encounters.AddRange(dungeon.Encounters);
             }
+
+            encounters.AddRange(journalExpansionWorldBossesInstanceResponse.Encounters);
+           
+
 
             //TODO: Worldbosses.
 
@@ -56,14 +61,25 @@ namespace ConduitData
 
             var request = new RestRequest(uri.PathAndQuery, Method.GET);
             var response = restClient.Execute<JournalInstanceResponse>(request);
-
-            if (!response.IsSuccessful)
-            {
-                throw response.ErrorException;
-            }
+            
+            if (!response.IsSuccessful && response.ErrorException != null) throw response.ErrorException;
 
             return response.Data;
         }
+
+
+        private static JournalInstanceResponse GetJournalExpansionResponseWorldBosses(IRestClient restClient)
+        {
+            // 1192 is the Shadowlands world bosses instance id
+            var request = new RestRequest("data/wow/journal-instance/1192");
+            request.AddParameter("namespace", "static-eu");
+            var response = restClient.Execute<JournalInstanceResponse>(request);
+
+            if (!response.IsSuccessful && response.ErrorException != null) throw response.ErrorException;
+
+            return response.Data;
+        }
+
 
         private static JournalEncounterResponse GetJournalEncounterResponse(IRestClient restClient, Key key)
         {
@@ -71,11 +87,8 @@ namespace ConduitData
             var request = new RestRequest(uri.PathAndQuery, Method.GET);
             var response = restClient.Execute<JournalEncounterResponse>(request);
 
-            if (!response.IsSuccessful)
-            {
-                throw response.ErrorException;
-            }
-
+            if (!response.IsSuccessful && response.ErrorException != null) throw response.ErrorException;
+            
             return response.Data;
         }
 
@@ -84,11 +97,8 @@ namespace ConduitData
             var request = new RestRequest("/data/wow/journal-expansion/499", Method.GET);
             request.AddParameter("namespace", "static-eu");
             var response = restClient.Execute<JournalExpansionResponse>(request);
-
-            if (!response.IsSuccessful)
-            {
-                throw response.ErrorException;
-            }
+            
+            if (!response.IsSuccessful && response.ErrorException != null) throw response.ErrorException;
 
             return response.Data;
         }
@@ -98,11 +108,8 @@ namespace ConduitData
             var uri = new Uri(conduit.Key.Href);
             var request = new RestRequest(uri.PathAndQuery, Method.GET);
             var response = restClient.Execute<ConduitResponse>(request);
-
-            if (!response.IsSuccessful)
-            {
-                throw response.ErrorException;
-            }
+            
+            if (!response.IsSuccessful && response.ErrorException != null) throw response.ErrorException;
 
             return response.Data;
         }
@@ -112,11 +119,8 @@ namespace ConduitData
             var request = new RestRequest("/data/wow/covenant/conduit/index", Method.GET);
             request.AddParameter("namespace", "static-eu");
             var response = restClient.Execute<ConduitIndexResponse>(request);
-
-            if (!response.IsSuccessful)
-            {
-                throw response.ErrorException;
-            }
+            
+            if (!response.IsSuccessful && response.ErrorException != null) throw response.ErrorException;
 
             return response.Data;
         }
@@ -129,11 +133,8 @@ namespace ConduitData
             var request = new RestRequest("/oauth/token", Method.POST);
             request.AddParameter("grant_type", "client_credentials");
             var response = client.Execute<AuthToken>(request);
-
-            if (!response.IsSuccessful)
-            {
-                throw response.ErrorException;
-            }
+            
+            if (!response.IsSuccessful && response.ErrorException != null) throw response.ErrorException;
 
             return response.Data;
         }
