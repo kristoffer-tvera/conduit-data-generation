@@ -20,14 +20,18 @@ namespace ConduitData
         private static int SHADOWLANDS_ID = 499;
         private static int TAZAVESH_ID = 1194;
         private static string OUTPUT_FILENAME = "ConduitDB.lua";
-        private static int[] PVP_VENDOR = { 1, 2, 3, 4 }; //TODO: Add conduits from pvp vendor
+        private static int[] PVP_VENDOR = { 187506, 182621, 182667, 180935, 182461, 182128, 183470, 181461, 180842, 183478, 182368, 181712, 182480, 182140, 181462, 181837, 181373, 183514, 181944, 183480, 182142, 181848, 181836, 183506, 182748, 182187, 182137, 182325, 182686, 183485, 183197, 182344, 182743, 181498, 182449, 182769, 182109, 182681, 183501, 182624, 182465, 181980, 183184, 181700, 181844, 183491, 183507, 181511, 181737, 182598 };
         static async Task Main(string[] args)
         {
+            Console.WriteLine("Starting");
+
             var authToken = await GetAuthToken(GetConfig());
 
             var client = new RestClient("https://eu.api.blizzard.com");
             client.AddDefaultHeader("Authorization", $"Bearer {authToken.AccessToken}");
             client.UseSystemTextJson();
+
+            Console.WriteLine("Token aquired, fetching conduits next");
 
             var conduitIndexResponse = await GetConduitIndexResponse(client);
 
@@ -153,11 +157,23 @@ namespace ConduitData
 
             Console.WriteLine("All data for worldbosses complete");
 
-            // Get item response to check vendor purchase flag?
-            //foreach(var conduit in conduits)
-            //{
-            //    var item = await GetItemResponse(client, conduit.Item.Id);
-            //}
+            foreach(var itemId in PVP_VENDOR)
+            {
+                var item = await GetItemResponse(client, itemId);
+                var conduit = conduits.FirstOrDefault(c => c.Name.EnGB == item.Name.EnGB);
+                if (conduit == null) continue;
+
+                conduitWithDropLocations.Add(new ConduitViewModel
+                {
+                    Name = conduit.Name.EnGB,
+                    Ilvl213 = $"PvP Vendor (unranked)",
+                    Ilvl226 = $"PvP Vendor (1600+)",
+                    Ilvl239 = $"PvP Vendor (1800+)",
+                    Ilvl252 = $"PvP Vendor (2100+)"
+                });
+            }
+
+            Console.WriteLine("All data for PvP vendor complete");
 
             conduitWithDropLocations = conduitWithDropLocations.OrderBy(c => c.Name).ToList();
             var usedArrayKeys = new List<string>();
@@ -177,7 +193,7 @@ namespace ConduitData
 
             var sb = new StringBuilder();
             sb.Append("local name,addon=...;\r\n");
-            sb.Append("addon.CONDUIT_DB = ");
+            sb.Append("addon.CONDUIT_DB = {");
             var allDropLocations = string.Join(",\r\n", dropLocations);
             sb.Append(allDropLocations);
             sb.Append("};");
@@ -203,7 +219,6 @@ namespace ConduitData
 
         private static async Task<JournalInstanceResponse> GetJournalInstanceResponseForWorldBosses(IRestClient restClient)
         {
-            // 1192 is the Shadowlands world bosses instance id
             var request = new RestRequest($"data/wow/journal-instance/{WORLDBOSS_ID}");
             request.AddParameter("namespace", "static-eu");
             var response = await restClient.ExecuteAsync<JournalInstanceResponse>(request);

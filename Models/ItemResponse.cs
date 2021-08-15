@@ -16,7 +16,7 @@ namespace ConduitData.Models
         public int Id { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public Name Name { get; set; }
 
         [JsonPropertyName("quality")]
         public Quality Quality { get; set; }
@@ -67,7 +67,7 @@ namespace ConduitData.Models
         public string Type { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public Name Name { get; set; }
     }
 
     public class Media
@@ -85,7 +85,7 @@ namespace ConduitData.Models
         public Key Key { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public Name Name { get; set; }
 
         [JsonPropertyName("id")]
         public int Id { get; set; }
@@ -97,7 +97,7 @@ namespace ConduitData.Models
         public Key Key { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public Name Name { get; set; }
 
         [JsonPropertyName("id")]
         public int Id { get; set; }
@@ -109,7 +109,7 @@ namespace ConduitData.Models
         public string Type { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public Name Name { get; set; }
     }
 
     public class Binding
@@ -118,7 +118,7 @@ namespace ConduitData.Models
         public string Type { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public Name Name { get; set; }
     }
 
     public class Spell
@@ -127,7 +127,7 @@ namespace ConduitData.Models
         public Spell This { get; set; }
 
         [JsonPropertyName("description")]
-        public string Description { get; set; }
+        public Name Description { get; set; }
     }
 
     public class Level
@@ -136,7 +136,7 @@ namespace ConduitData.Models
         public int Value { get; set; }
 
         [JsonPropertyName("display_string")]
-        public string DisplayString { get; set; }
+        public Name DisplayString { get; set; }
     }
 
     public class PreviewItem
@@ -148,7 +148,7 @@ namespace ConduitData.Models
         public Quality Quality { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public Name Name { get; set; }
 
         [JsonPropertyName("media")]
         public Media Media { get; set; }
